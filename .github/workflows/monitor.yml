@@ -1,6 +1,9 @@
 name: 旭川消防出動監視
 
 on:
+  push:
+    paths:
+      - ".github/workflows/monitor.yml"
   schedule:
     # 毎時2分から5分おき。毎時0分の混雑を避ける。
     - cron: "2-59/5 * * * *"
