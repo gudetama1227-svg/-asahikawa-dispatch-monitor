@@ -183,7 +183,7 @@ def create_notification(event: dict[str, str]) -> None:
     github_request(
         "POST",
         "/issues",
-        {"title": title, "body": body, "assignees": [ASSIGNEE]},
+        {"title": title, "body": body},
     )
 
 
