@@ -18,7 +18,7 @@ permissions:
 
 concurrency:
   group: asahikawa-dispatch-monitor
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   monitor:
