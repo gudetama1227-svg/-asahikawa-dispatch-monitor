@@ -172,6 +172,7 @@ def existing_keys() -> set[str]:
 def create_notification(event: dict[str, str]) -> None:
     title = f"🚒 {event['kind']}｜{event['location']}"
     body = (
+        f"@{ASSIGNEE}\n\n"
         f"旭川市消防本部の出動情報に新しい情報が掲載されました。\n\n"
         f"- 日時：{event['date']} {event['time']}\n"
         f"- 場所：{event['location']}\n"
