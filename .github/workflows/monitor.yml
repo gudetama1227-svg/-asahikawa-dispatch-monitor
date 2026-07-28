@@ -27,6 +27,16 @@ jobs:
       - name: リポジトリを取得
         uses: actions/checkout@v4
 
+      - name: iPhone通知をテスト
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[notify-test]')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "🔔 旭川出動通知の自動テスト" \
+            --body "実際の監視と同じ自動処理から送信した通知テストです。" \
+            --assignee "gudetama1227-svg"
+
       - name: 出動情報を確認
         if: github.event.schedule != '17 3 1 * *'
         env:
