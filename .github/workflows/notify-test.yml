@@ -1,0 +1,21 @@
+name: iPhoneメンション通知テスト
+
+on:
+  push:
+    paths:
+      - ".github/workflows/notify-test.yml"
+
+permissions:
+  issues: write
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: メンション通知を送信
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment 2 \
+            --repo "${{ github.repository }}" \
+            --body "@gudetama1227-svg 自動監視からのメンション通知テストです。"
