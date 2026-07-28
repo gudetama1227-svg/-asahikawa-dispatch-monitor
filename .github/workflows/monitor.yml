@@ -5,46 +5,37 @@ on:
     paths:
       - ".github/workflows/monitor.yml"
   schedule:
-    # 毎時2分から5分おき。毎時0分の混雑を避ける。
-    - cron: "2-59/5 * * * *"
+    # 自動連鎖が止まった場合の復旧用（毎時17分）。
+    - cron: "17 * * * *"
     # 公開リポジトリの定期実行が休止されないよう月1回更新する。
-    - cron: "17 3 1 * *"
+    - cron: "23 3 1 * *"
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: write
   issues: write
 
 concurrency:
   group: asahikawa-dispatch-monitor
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   monitor:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 8
     steps:
       - name: リポジトリを取得
         uses: actions/checkout@v4
 
-      - name: iPhone通知をテスト
-        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[notify-test]')
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh issue create \
-            --title "🔔 旭川出動通知の自動テスト" \
-            --body "実際の監視と同じ自動処理から送信した通知テストです。" \
-            --assignee "gudetama1227-svg"
-
       - name: 出動情報を確認
-        if: github.event.schedule != '17 3 1 * *'
+        if: github.event.schedule != '23 3 1 * *'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 monitor.py
 
       - name: 定期実行を維持
-        if: github.event.schedule == '17 3 1 * *'
+        if: github.event.schedule == '23 3 1 * *'
         run: |
           date -u +%Y-%m-%d > .monitor-heartbeat
           git config user.name "github-actions[bot]"
@@ -52,3 +43,11 @@ jobs:
           git add .monitor-heartbeat
           git commit -m "監視ワークフローを維持" || exit 0
           git push
+
+      - name: 約5分後の監視を予約
+        if: github.event.schedule != '23 3 1 * *'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sleep 285
+          gh workflow run monitor.yml --ref main
