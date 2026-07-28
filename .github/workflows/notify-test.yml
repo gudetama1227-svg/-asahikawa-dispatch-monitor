@@ -18,4 +18,4 @@ jobs:
         run: |
           gh issue comment 2 \
             --repo "${{ github.repository }}" \
-            --body "@gudetama1227-svg 自動監視からのメンション通知テストです。"
+            --body "@gudetama1227-svg 2回目の自動監視メンション通知テストです。"
