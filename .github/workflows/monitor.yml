@@ -28,6 +28,13 @@ jobs:
       - name: リポジトリを取得
         uses: actions/checkout@v4
 
+      - name: iPhoneメンション通知をテスト
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[mention-test]')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment 2 --body "@gudetama1227-svg 自動監視からのメンション通知テストです。"
+
       - name: 出動情報を確認
         if: github.event.schedule != '23 3 1 * *'
         env:
