@@ -15,7 +15,7 @@ from html.parser import HTMLParser
 
 SOURCE_URL = "http://fc23371220232011.web4.blks.jp/html/index.html"
 OFFICIAL_URL = "https://www.city.hakodate.hokkaido.jp/docs/2016050900014/"
-ASSIGNEE = "gudetama1227-svg"
+RECIPIENTS = ("gudetama1227-svg", "abe0800")
 USER_AGENT = "HakodateDispatchMonitor/1.0 (+GitHub Actions)"
 KEY_MARKER = "hakodate-dispatch-key"
 
@@ -187,8 +187,9 @@ def existing_keys() -> set[str]:
 
 def create_notification(event: dict[str, str]) -> None:
     title = f"🚒 函館｜{event['kind']}｜{event['location']}"
+    mentions = " ".join(f"@{username}" for username in RECIPIENTS)
     body = (
-        f"@{ASSIGNEE}\n\n"
+        f"{mentions}\n\n"
         "函館市消防本部の災害情報に新しい出動が掲載されました。\n\n"
         f"- 日時：{event['date']} {event['time']}\n"
         f"- 場所：{event['location']}\n"
