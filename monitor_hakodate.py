@@ -15,7 +15,7 @@ from html.parser import HTMLParser
 
 SOURCE_URL = "http://fc23371220232011.web4.blks.jp/html/index.html"
 OFFICIAL_URL = "https://www.city.hakodate.hokkaido.jp/docs/2016050900014/"
-RECIPIENTS = ("gudetama1227-svg", "abe0800")
+RECIPIENTS = ("abe0800",)
 USER_AGENT = "HakodateDispatchMonitor/1.0 (+GitHub Actions)"
 KEY_MARKER = "hakodate-dispatch-key"
 
