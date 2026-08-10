@@ -45,6 +45,7 @@ jobs:
         if: github.event.schedule != '23 3 1 * *'
         env:
           KAMIKAWA_SITES_TOKEN: ${{ secrets.KAMIKAWA_SITES_TOKEN }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
         run: |
           test -n "$KAMIKAWA_SITES_TOKEN"
           curl --fail --silent --show-error \
@@ -53,6 +54,7 @@ jobs:
             -X POST \
             -H "OAI-Sites-Authorization: Bearer $KAMIKAWA_SITES_TOKEN" \
             -H "Authorization: Bearer $KAMIKAWA_SITES_TOKEN" \
+            -H "X-Threads-Access-Token: $THREADS_ACCESS_TOKEN" \
             https://kamikawa-news-radar.gudetama1227.chatgpt.site/api/cron/scan
 
       - name: 定期実行を維持
