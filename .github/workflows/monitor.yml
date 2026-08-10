@@ -41,6 +41,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 monitor.py
 
+      - name: 上川レーダーを更新
+        if: github.event.schedule != '23 3 1 * *'
+        env:
+          KAMIKAWA_SITES_TOKEN: ${{ secrets.KAMIKAWA_SITES_TOKEN }}
+        run: |
+          test -n "$KAMIKAWA_SITES_TOKEN"
+          curl --fail --silent --show-error \
+            --retry 2 --retry-all-errors \
+            --max-time 150 \
+            -X POST \
+            -H "OAI-Sites-Authorization: Bearer $KAMIKAWA_SITES_TOKEN" \
+            -H "Authorization: Bearer $KAMIKAWA_SITES_TOKEN" \
+            https://kamikawa-news-radar.gudetama1227.chatgpt.site/api/cron/scan
+
       - name: 定期実行を維持
         if: github.event.schedule == '23 3 1 * *'
         run: |
