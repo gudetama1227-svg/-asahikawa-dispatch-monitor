@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - ".github/workflows/monitor.yml"
+      - "monitor_x.py"
   schedule:
     # 自動連鎖が止まった場合の復旧用（毎時17分）。
     - cron: "17 * * * *"
@@ -41,6 +42,25 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 monitor.py
 
+      - name: AgentReach方式でXを補助監視
+        if: github.event.schedule != '23 3 1 * *'
+        env:
+          TWITTER_AUTH_TOKEN: ${{ secrets.TWITTER_AUTH_TOKEN }}
+          TWITTER_CT0: ${{ secrets.TWITTER_CT0 }}
+        run: |
+          if [ -z "$TWITTER_AUTH_TOKEN" ] || [ -z "$TWITTER_CT0" ]; then
+            printf '%s' '{"connected":false,"status":"not_configured","checked":0,"detections":[],"error":null}' > /tmp/x-monitor.json
+          elif [ $(( $(date +%s) / 300 % 3 )) -eq 0 ]; then
+            if python3 -m pip install --quiet --disable-pip-version-check twitter-cli==0.8.6 \
+              && python3 monitor_x.py > /tmp/x-monitor.json; then
+              true
+            else
+              printf '%s' '{"connected":true,"status":"error","checked":0,"detections":[],"error":"AgentReach backend failed"}' > /tmp/x-monitor.json
+            fi
+          else
+            printf '%s' '{"connected":true,"status":"skipped","checked":0,"detections":[],"error":null}' > /tmp/x-monitor.json
+          fi
+
       - name: 上川レーダーを更新
         if: github.event.schedule != '23 3 1 * *'
         env:
@@ -55,6 +75,8 @@ jobs:
             -H "OAI-Sites-Authorization: Bearer $KAMIKAWA_SITES_TOKEN" \
             -H "Authorization: Bearer $KAMIKAWA_SITES_TOKEN" \
             -H "X-Threads-Access-Token: $THREADS_ACCESS_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data-binary @/tmp/x-monitor.json \
             https://kamikawa-news-radar.gudetama1227.chatgpt.site/api/cron/scan
 
       - name: 定期実行を維持
